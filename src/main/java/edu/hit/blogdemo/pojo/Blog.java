@@ -8,8 +8,6 @@ import java.sql.Timestamp;
 @Entity
 public class Blog {
 
-    //外键category_id,通过引入外键对应类Category
-    private Category category;
     private int blogId;
     private int userId;
     private String title;
@@ -29,15 +27,7 @@ public class Blog {
     private String cover;
 
 
-    @ManyToOne
-    @JoinColumn(name="category_id")
-    public Category getCategory() {
-        return category;
-    }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
 
     @Id
     @Column(name = "blog_id")

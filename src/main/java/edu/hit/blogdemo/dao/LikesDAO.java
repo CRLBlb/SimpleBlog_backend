@@ -1,8 +1,6 @@
 package edu.hit.blogdemo.dao;
 
-import edu.hit.blogdemo.pojo.Blog;
 import edu.hit.blogdemo.pojo.Likes;
-import edu.hit.blogdemo.pojo.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

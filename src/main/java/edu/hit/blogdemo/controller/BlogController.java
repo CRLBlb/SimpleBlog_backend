@@ -31,9 +31,48 @@ public class BlogController {
     @CrossOrigin
     @GetMapping("/api/blog/{size}/{page}")
     //分页查询博文信息
-    public Result listArticles(@PathVariable("size") int size, @PathVariable("page") int page) {
+    public Result listArticles(@PathVariable("size") int size
+            , @PathVariable("page") int page) {
         return ResultFactory.buildSuccessResult(blogService.list(page - 1, size));
     }
+
+    @CrossOrigin
+    @GetMapping("/api/blogbytitle/{size}/{page}")
+    //分页根据文章标题查询博文信息
+    public Result listArticlesByTitle(@PathVariable("size") int size
+            , @PathVariable("page") int page
+            ,@RequestParam("title") String title) {
+        // 关键词为空时查询出所有博文
+        if ("".equals(title)) {
+            System.out.println("查询所有博文信息!");
+            return ResultFactory
+                    .buildSuccessResult(blogService.list(page - 1, size));
+        }
+        else {
+            System.out.println("查询指定标题博文!");
+            return ResultFactory
+                    .buildSuccessResult(blogService.
+                            findAllByTitleLike(page - 1, size,title));
+        }
+    }
+
+//    @CrossOrigin
+//    @GetMapping("/api/search")
+//    //根据博文标题查询博文信息
+//    public Result searchResult(@RequestParam("keyword") String keywords) {
+//        // 关键词为空时查询出所有博文
+//        if ("".equals(keywords)) {
+//            System.out.println("查询所有信息!");
+//            return ResultFactory
+//                    .buildSuccessResult(blogService.list());
+//        } else {
+//            System.out.println("查询指定标题博文!");
+//            return ResultFactory
+//                    .buildSuccessResult(blogService.findAllByTitleLike(keywords));
+//        }
+//    }
+
+
     @CrossOrigin
     @GetMapping("/api/blog/{id}")
     //根据博文Id获取博文信息
@@ -41,24 +80,16 @@ public class BlogController {
         return ResultFactory.buildSuccessResult(blogService.findByBlogId(blogId));
     }
 
-
-
     @CrossOrigin
-    @GetMapping("/api/searchblog/{title}")
-    //搜索文章
-    public Result searchArticle(@PathVariable("title") String title) {
-        return ResultFactory.buildSuccessResult(blogService.search(title));
-    }
-
-
-    @CrossOrigin
-    @PostMapping("/api/likeblog/{id}")
+    @PostMapping("/api/likeblog/{blogId}/{userId}")
     @ResponseBody
     //点赞博文
-    public Result likeBlog(@PathVariable("id") int blogId,@RequestBody Likes likes ) {
+    public Result likeBlog(@PathVariable("blogId") int blogId
+            ,@PathVariable("userId") int userId
+            ,@RequestBody Likes likes ) {
         Blog blog = blogService.findByBlogId(blogId);
         //用户之前未点赞
-        if(likesService.findByBlogIdAndUserId(blogId,blog.getUserId()) == null){
+        if(likesService.findByBlogIdAndUserId(blogId,userId) == null){
             //更新点赞数
             blog.setLikeNum(blog.getLikeNum()+1);
             //更新文章点赞数
@@ -72,7 +103,7 @@ public class BlogController {
         else{
             //删除用户-点赞数据信息
             likesService.deleteUserLikes(likesService
-                    .findByBlogIdAndUserId(blogId,blog.getUserId()).getLikeId());
+                    .findByBlogIdAndUserId(blogId,userId).getLikeId());
             //文章点赞数-1
             blog.setLikeNum(blog.getLikeNum()-1);
             //更新文章点赞数
@@ -85,13 +116,14 @@ public class BlogController {
 
 
     @CrossOrigin
-    @GetMapping("/api/checklikeblog/{id}")
+    @GetMapping("/api/checklikeblog/{blogId}/{userId}")
     @ResponseBody
     //点赞博文
-    public Result checkLikeBlog(@PathVariable("id") int blogId) {
+    public Result checkLikeBlog(@PathVariable("blogId") int blogId
+            ,@PathVariable("userId") int userId) {
         Blog blog = blogService.findByBlogId(blogId);
         //用户之前未点赞
-        if(likesService.findByBlogIdAndUserId(blogId,blog.getUserId()) == null){
+        if(likesService.findByBlogIdAndUserId(blogId,userId) == null){
             //Do Nothing just Check
             return ResultFactory.buildSuccessResult("未点赞");
         }
@@ -116,13 +148,15 @@ public class BlogController {
 
 
     @CrossOrigin
-    @PostMapping("/api/collectionblog/{id}")
+    @PostMapping("/api/collectionblog/{blogId}/{userId}")
     @ResponseBody
     //收藏博文
-    public Result collectionBlog(@PathVariable("id") int blogId,@RequestBody Collections collections ) {
+    public Result collectionBlog(@PathVariable("blogId") int blogId
+            ,@PathVariable("userId") int userId
+            ,@RequestBody Collections collections ) {
         Blog blog = blogService.findByBlogId(blogId);
         //用户之前未收藏
-        if(collectionsService.findByBlogIdAndUserId(blogId,blog.getUserId()) == null){
+        if(collectionsService.findByBlogIdAndUserId(blogId,userId) == null){
             //更新收藏数
             blog.setCollectionNum(blog.getCollectionNum()+1);
             //更新文章收藏数
@@ -136,7 +170,7 @@ public class BlogController {
         else{
             //删除用户-收藏数据信息
             collectionsService.deleteUserCollections(collectionsService
-                    .findByBlogIdAndUserId(blogId,blog.getUserId()).getCollectionId());
+                    .findByBlogIdAndUserId(blogId,userId).getCollectionId());
             //文章收藏数-1
             blog.setCollectionNum(blog.getCollectionNum()-1);
             //更新文章收藏数
@@ -147,13 +181,14 @@ public class BlogController {
     }
 
     @CrossOrigin
-    @GetMapping("/api/checkcollectionblog/{id}")
+    @GetMapping("/api/checkcollectionblog/{blogId}/{userId}")
     @ResponseBody
-    //收藏博文
-    public Result checkCollectionBlog(@PathVariable("id") int blogId) {
+    //检测用户是否收藏信息
+    public Result checkCollectionBlog(@PathVariable("blogId") int blogId
+            ,@PathVariable("userId") int userId) {
         Blog blog = blogService.findByBlogId(blogId);
-        //用户之前未收藏
-        if(collectionsService.findByBlogIdAndUserId(blogId,blog.getUserId()) == null){
+        //已登录用户之前未收藏过此文章
+        if(collectionsService.findByBlogIdAndUserId(blogId,userId) == null){
             //Do Nothing just Check
             return ResultFactory.buildSuccessResult("未收藏");
         }

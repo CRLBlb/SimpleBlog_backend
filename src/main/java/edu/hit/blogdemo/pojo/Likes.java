@@ -1,5 +1,7 @@
 package edu.hit.blogdemo.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -9,6 +11,8 @@ public class Likes {
     private int likeId;
     private int blogId;
     private int userId;
+    //设置时间格式
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp likeCreateTime;
     private Byte status;
 

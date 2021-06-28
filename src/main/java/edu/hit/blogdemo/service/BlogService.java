@@ -3,7 +3,6 @@ package edu.hit.blogdemo.service;
 import edu.hit.blogdemo.dao.BlogDAO;
 import edu.hit.blogdemo.dao.LikesDAO;
 import edu.hit.blogdemo.pojo.Blog;
-import edu.hit.blogdemo.pojo.Category;
 import edu.hit.blogdemo.util.MyPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,10 +23,8 @@ public class BlogService {
     BlogDAO blogDAO;
     @Autowired
     LikesDAO likesDAO;
-    @Autowired
-    private CategoryService categoryService;
 
-
+    //分页查询所有信息
     public MyPage list(int page, int size) {
         MyPage<Blog> articles;
         Sort sort = new Sort(Sort.Direction.DESC, "blogId");
@@ -35,33 +32,39 @@ public class BlogService {
         articles = new MyPage<>(articlesInDb);
         return articles;
     }
+
+    //分页根据标题模糊查询Blog所有信息
+    public MyPage findAllByTitleLike(int page, int size,String  title) {
+        MyPage<Blog> articles;
+        Sort sort = new Sort(Sort.Direction.DESC, "blogId");
+        Page<Blog> articlesInDb = blogDAO.findAllByTitleLike(PageRequest.of(page, size, sort)
+                ,'%' + title + '%');
+        articles = new MyPage<>(articlesInDb);
+        return articles;
+    }
+
+    //根据Id寻找博文信息
     public Blog findByBlogId(int id) {
         Blog blog;
         blog = blogDAO.findByBlogId(id);
         return blog;
     }
-
+    //查询所有博文信息
     public List<Blog> list() {
         Sort sort = new Sort(Sort.Direction.DESC, "blogId");
         return blogDAO.findAll(sort);
     }
-
+    //添加或更新博文信息
     public void addOrUpdate(Blog Blog) {
         blogDAO.save(Blog);
     }
-
+    //根据Id删除博文信息
     public void deleteById(int id) {
         blogDAO.deleteById(id);
     }
 
-    public List<Blog> listByCategory(int cid) {
-        Category category = categoryService.get(cid);
-        return blogDAO.findAllByCategory(category);
-    }
-    //模糊查询Blog
-    public List<Blog> search(String keywords) {
-        return blogDAO.findAllByTitleLike('%' + keywords + '%');
-    }
+
+
 
     //消息模块查询所有博文
     public List<Blog> findAllByUserId(int userId){
@@ -87,5 +90,4 @@ public class BlogService {
     public Blog findById(int blogid){
         return blogDAO.findByBlogId(blogid);
     }
-
 }

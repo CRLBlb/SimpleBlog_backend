@@ -2,7 +2,6 @@ package edu.hit.blogdemo.dao;
 
 
 
-import edu.hit.blogdemo.pojo.Category;
 import edu.hit.blogdemo.pojo.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
