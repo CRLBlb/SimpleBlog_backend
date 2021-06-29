@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -56,9 +59,15 @@ public class FollowService {
     }
 
     public void add(int fanid, int starid) {
+
         Follow follow = new Follow();
         follow.setFanId(fanid);
         follow.setStarId(starid);
+        Timestamp createTime = new Timestamp(new Date().getTime());
+        follow.setFollowCreatTime(createTime);
+        Byte b = 0;
+        follow.setStatus(b);
+
         followDAO.save(follow);
     }
 

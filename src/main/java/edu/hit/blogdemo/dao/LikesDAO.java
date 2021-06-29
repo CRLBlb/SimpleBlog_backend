@@ -13,6 +13,8 @@ public interface LikesDAO extends JpaRepository<Likes,Integer> {
     //根据likeId删除某个点赞数据
     public void deleteByLikeId(int likeId);
 
+    public List<Likes> findAllByUserId(int userId);
+
 
     List<Likes> findAllByBlogId(int blogId);
 

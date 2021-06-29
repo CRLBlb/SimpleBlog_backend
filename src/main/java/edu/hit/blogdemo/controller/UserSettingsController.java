@@ -1,7 +1,6 @@
 package edu.hit.blogdemo.controller;
 
 import edu.hit.blogdemo.pojo.UserSettings;
-import edu.hit.blogdemo.result.Result;
 import edu.hit.blogdemo.service.UserSettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

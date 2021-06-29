@@ -23,4 +23,5 @@ public interface MessageDAO extends JpaRepository<MessageEntity, Integer> {
             "where (sender_id =?1 and receiver_id = ?2)",nativeQuery = true)
     public void readMessage(Integer sender_id, Integer receiver_id);
     public List<MessageEntity> findMessageEntitiesBySenderIdAndReceiverId(Integer sender_id, Integer receiver_id);
+    public List<MessageEntity> findAllByReceiverIdAndIsRead(Integer id,byte b);
 }

@@ -56,8 +56,17 @@ public class CommentService {
     public List<Comment>findAllByBlogId(int blogId){
         return commentDAO.findAllByBlogIdOrderByCommentCreateTime(blogId);
     }
-    public void save(Comment comment){commentDAO.save(comment);}
+    public void save(Comment comment){
+        commentDAO.save(comment);
+    }
+    public Comment adminSave(Comment comment){
+        return commentDAO.save(comment);
+    }
 
+
+    public Comment findById(int commentId) {
+        return commentDAO.findById(commentId).get();
+    }
 
 
 }

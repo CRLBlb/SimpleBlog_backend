@@ -14,9 +14,12 @@ public class UserBroadcastService {
     @Autowired
     UserBroadcastDAO userBroadcastDAO;
     public void save(UserBroadcast userBroadcast){userBroadcastDAO.save(userBroadcast);}
+    //管理员方法
+    public UserBroadcast adminSave(UserBroadcast userBroadcast){ return userBroadcastDAO.save(userBroadcast);}
     public List<UserBroadcast> findAllByUserId(int userId){return userBroadcastDAO.findAllByUserId(userId);}
     public Page<UserBroadcast> findAll(Pageable pageable){return userBroadcastDAO.findAll(pageable);}
     public UserBroadcast findByBroadcastIdAndUserId(int id,int bid){return userBroadcastDAO.findByBroadcastIdAndUserId(id,bid);}
     public UserBroadcast findById(int id){return userBroadcastDAO.findById(id);}
     public void deleteById(int id){userBroadcastDAO.deleteById(id);}
+
 }

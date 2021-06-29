@@ -67,6 +67,13 @@ public class MessageController {
         return num;
     }
 
+    @CrossOrigin
+    @GetMapping("/api/checkUnreadMessage")
+    @ResponseBody
+    public boolean checkUnreadMessage(@RequestParam("id") Integer id){
+        return messageService.checkMessage(id);
+    }
+
     //发起会话
     @CrossOrigin
     @GetMapping("/api/addSession")

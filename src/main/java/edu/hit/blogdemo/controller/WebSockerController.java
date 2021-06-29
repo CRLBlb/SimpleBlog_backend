@@ -1,6 +1,5 @@
 package edu.hit.blogdemo.controller;
 
-import edu.hit.blogdemo.pojo.UserSettings;
 import edu.hit.blogdemo.service.BlogService;
 import edu.hit.blogdemo.service.UserSettingsService;
 import edu.hit.blogdemo.service.WebSocket;
@@ -30,19 +29,34 @@ public class WebSockerController {
     }
     @ResponseBody
     @GetMapping("api/sendOneWebSocket/{blogId}/{type}")
-    public String sendOneWebSocket(@PathVariable("blogId")int blogId,@PathVariable("type")String type) {
+    public String sendOneWebSocket(@PathVariable("blogId")int blogId
+            ,@PathVariable("type")String type) {
+        if(type.equals("follow")){
+            String userName = Integer.toString(blogId);
+            if(userSettingsService.findAllByUserId(blogId).getFollowW()==1){
+                webSocket.sendOneMessage(userName,type);
+            }
+            if(userSettingsService.findAllByUserId(blogId).getIsFollow()==1){
+                webSocket.sendOneMessage(userName,type+"w");
+            }
+            return type;
+        }
         int userId = blogService.findByBlogId(blogId).getUserId();
         String userName = Integer.toString(userId);
         try {
-            if((type.equals("broadcast")&&userSettingsService.findAllByUserId(userId).getBroadcastW()==1)
-                    ||(type.equals("like")&&userSettingsService.findAllByUserId(userId).getLikeW()==1)
-                    ||(type.equals("follow")&&userSettingsService.findAllByUserId(userId).getFollowW()==1)
-                    ||(type.equals("comment")&&userSettingsService.findAllByUserId(userId).getCommentW()==1))
+            if((type.equals("broadcast")&&
+                    userSettingsService.findAllByUserId(userId).getBroadcastW()==1)
+                    ||(type.equals("like")&&
+                    userSettingsService.findAllByUserId(userId).getLikeW()==1)
+                    ||(type.equals("comment")&&
+                    userSettingsService.findAllByUserId(userId).getCommentW()==1))
                 webSocket.sendOneMessage(userName,type);
-            if((type.equals("broadcast")&&userSettingsService.findAllByUserId(userId).getIsBroadcast()==1)
-                    ||(type.equals("like")&&userSettingsService.findAllByUserId(userId).getIsLike()==1)
-                    ||(type.equals("follow")&&userSettingsService.findAllByUserId(userId).getIsFollow()==1)
-                    ||(type.equals("comment")&&userSettingsService.findAllByUserId(userId).getIsComment()==1))
+            if((type.equals("broadcast")&&
+                    userSettingsService.findAllByUserId(userId).getIsBroadcast()==1)
+                    ||(type.equals("like")&&
+                    userSettingsService.findAllByUserId(userId).getIsLike()==1)
+                    ||(type.equals("comment")&&
+                    userSettingsService.findAllByUserId(userId).getIsComment()==1))
                 webSocket.sendOneMessage(userName,type+"w");
         }catch(Exception e){
             System.out.println("该用户未连接");

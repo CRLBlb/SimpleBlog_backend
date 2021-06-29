@@ -2,6 +2,7 @@ package edu.hit.blogdemo.controller;
 
 import edu.hit.blogdemo.pojo.Blog;
 import edu.hit.blogdemo.pojo.Comment;
+import edu.hit.blogdemo.result.Result;
 import edu.hit.blogdemo.service.BlogService;
 import edu.hit.blogdemo.service.CommentService;
 import edu.hit.blogdemo.service.UserService;
@@ -75,4 +76,64 @@ public class CommentController {
         comment.setStatus(tag);
         commentService.save(comment);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //管理员模块
+
+    // 测试通过
+    @CrossOrigin
+    @PostMapping(value = "api/admin/comment/findAll")
+    // 此注解的作用是读取http请求的内容
+    @ResponseBody
+    public List<Comment> findAll(){
+        return commentService.findAll();
+    }
+
+    // 测试通过
+    // 通过评论的id获取博客标题
+    @CrossOrigin
+    @ResponseBody
+    @RequestMapping(value = "api/admin/comment/findBlogByCommentId/{commentId}")
+    public String findBlogByCommentId(@PathVariable(value="commentId")int commentId){
+        Comment comment = commentService.findById(commentId);
+        int blogId = comment.getBlogId();
+        Blog blog = blogService.findByBlogId(blogId);
+        return blog.getTitle();
+    }
+
+
+    // 通过评论的id和bool类型的审核结果修改数据库信息
+    @CrossOrigin
+    @ResponseBody
+    @RequestMapping(value = "api/admin/comment/changeStatus/{commentId}/{pass}")
+    public Result changeStatus(@PathVariable(value="commentId")int commentId, @PathVariable(value="pass")boolean pass){
+        Comment comment = commentService.findById(commentId);
+        if(pass){
+            comment.setPass((byte)1);
+        }else {
+            comment.setPass((byte)2);
+        }
+        comment = commentService.adminSave(comment);
+        if(comment!=null){
+            return new Result(200);
+        } else {
+            return new Result(400);
+        }
+    }
+
+
+
+
 }

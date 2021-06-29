@@ -20,4 +20,16 @@ public class BroadcastService {
     public void save(Broadcast broadcast){ broadcastDAO.save(broadcast);}
     public Page<Broadcast> findAll(Pageable pageable){return broadcastDAO.findAll(pageable);}
     public Broadcast findByBroadcastId(int id){return broadcastDAO.findByBroadcastId(id);}
+
+    public Broadcast createBroadcast(Broadcast broadcast) {
+        return broadcastDAO.save(broadcast);
+    }
+
+
+    public Broadcast findBroadcastById(int broadcastId) {
+        return broadcastDAO.findByBroadcastId(broadcastId);
+    }
+    public int findMaxId() {
+        return broadcastDAO.findMaxId();
+    }
 }

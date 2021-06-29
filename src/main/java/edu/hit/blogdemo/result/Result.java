@@ -2,6 +2,11 @@ package edu.hit.blogdemo.result;
 
 
 public class Result {
+    //管理员Result构造方法
+    public Result(int code) {
+        this.code = code;
+    }
+
     public int getCode() {
         return code;
     }
@@ -30,7 +35,7 @@ public class Result {
     private String message;
     private Object result;
 
-    Result(int code, String message, Object data) {
+    public Result(int code, String message, Object data) {
         this.code = code;
         this.message = message;
         this.result = data;

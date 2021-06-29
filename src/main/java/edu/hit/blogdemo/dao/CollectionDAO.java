@@ -1,7 +1,10 @@
 package edu.hit.blogdemo.dao;
 
 import edu.hit.blogdemo.pojo.Collections;
+import edu.hit.blogdemo.pojo.Likes;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 public interface CollectionDAO extends JpaRepository<Collections,Integer> {
 
@@ -11,4 +14,6 @@ public interface CollectionDAO extends JpaRepository<Collections,Integer> {
     public Collections findByBlogIdAndUserId(int blodId,int userId);
     //根据collectionId删除某个收藏数据
     public void deleteByCollectionId(int collectionId);
+
+    public List<Collections> findAllByUserId(int userId);
 }

@@ -1,9 +1,6 @@
 package edu.hit.blogdemo.result;
 
-/**
- * @author Evan
- * @date 2019/4
- */
+
 public class ResultFactory {
 
     public static Result buildSuccessResult(Object data) {

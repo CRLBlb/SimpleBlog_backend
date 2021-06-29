@@ -17,6 +17,7 @@ public class LoginController {
     @Autowired
     UserService userService;
 
+
     @CrossOrigin
     @PostMapping(value = "api/login")
     @ResponseBody
@@ -28,11 +29,21 @@ public class LoginController {
         if (null == user) {
             System.out.println("登录失败！");
             return ResultFactory.buildFailResult("密码错误");
-
-        } else {
-            System.out.println("登录成功！");
-            System.out.println(user);
-            return ResultFactory.buildSuccessResult(user);
+        }
+        else {
+            //判断用户是否加入黑名单
+            //0:加入黑名单 1：未加入黑名单
+            //用户被加入黑名单
+            if(user.getStatus()==0){
+                System.out.println("登录失败，用户已被冻结！");
+                return ResultFactory.buildFailResult("用户被冻结");
+            }
+            //用户未加入黑名单
+            else{
+                System.out.println("登录成功！");
+                System.out.println(user);
+                return ResultFactory.buildSuccessResult(user);
+            }
         }
     }
     @CrossOrigin

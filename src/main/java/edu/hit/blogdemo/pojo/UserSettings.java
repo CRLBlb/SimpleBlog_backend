@@ -4,9 +4,12 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user_settings", schema = "vueblog", catalog = "")
+//@Table(name = "user_settings", schema = "vueblog", catalog = "")
+@Table(name = "user_settings", schema = "vueblog")
 public class UserSettings {
     private int userId;
+    //设置默认字段值
+//    @Column(insertable = false,columnDefinition = "byte default 1")
     private Byte isComment;
     private Byte isLike;
     private Byte isFollow;
@@ -66,19 +69,6 @@ public class UserSettings {
         this.isBroadcast = isBroadcast;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserSettings that = (UserSettings) o;
-        return userId == that.userId && Objects.equals(isComment, that.isComment) && Objects.equals(isLike, that.isLike) && Objects.equals(isFollow, that.isFollow) && Objects.equals(isBroadcast, that.isBroadcast);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId, isComment, isLike, isFollow, isBroadcast);
-    }
-
     @Basic
     @Column(name = "comment_w")
     public Byte getCommentW() {
@@ -117,5 +107,18 @@ public class UserSettings {
 
     public void setBroadcastW(Byte broadcastW) {
         this.broadcastW = broadcastW;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserSettings that = (UserSettings) o;
+        return userId == that.userId && Objects.equals(isComment, that.isComment) && Objects.equals(isLike, that.isLike) && Objects.equals(isFollow, that.isFollow) && Objects.equals(isBroadcast, that.isBroadcast) && Objects.equals(commentW, that.commentW) && Objects.equals(likeW, that.likeW) && Objects.equals(followW, that.followW) && Objects.equals(broadcastW, that.broadcastW);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, isComment, isLike, isFollow, isBroadcast, commentW, likeW, followW, broadcastW);
     }
 }

@@ -3,10 +3,7 @@ package edu.hit.blogdemo.controller;
 import edu.hit.blogdemo.pojo.*;
 import edu.hit.blogdemo.result.Result;
 import edu.hit.blogdemo.result.ResultFactory;
-import edu.hit.blogdemo.service.BlogService;
-import edu.hit.blogdemo.service.CollectionsService;
-import edu.hit.blogdemo.service.CommentService;
-import edu.hit.blogdemo.service.LikesService;
+import edu.hit.blogdemo.service.*;
 import edu.hit.blogdemo.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -27,13 +27,15 @@ public class BlogController {
     CollectionsService collectionsService;
     @Autowired
     CommentService commentService;
+    @Autowired
+    UserService userService;
 
     @CrossOrigin
     @GetMapping("/api/blog/{size}/{page}")
     //分页查询博文信息
     public Result listArticles(@PathVariable("size") int size
             , @PathVariable("page") int page) {
-        return ResultFactory.buildSuccessResult(blogService.list(page - 1, size));
+        return ResultFactory.buildSuccessResult(blogService.list(page - 1, size,1));
     }
 
     @CrossOrigin
@@ -46,32 +48,27 @@ public class BlogController {
         if ("".equals(title)) {
             System.out.println("查询所有博文信息!");
             return ResultFactory
-                    .buildSuccessResult(blogService.list(page - 1, size));
+                    .buildSuccessResult(blogService.list(page - 1, size,1));
         }
         else {
             System.out.println("查询指定标题博文!");
             return ResultFactory
                     .buildSuccessResult(blogService.
-                            findAllByTitleLike(page - 1, size,title));
+                            findAllByTitleLikeAndStatus(page - 1, size,title,1));
         }
     }
 
-//    @CrossOrigin
-//    @GetMapping("/api/search")
-//    //根据博文标题查询博文信息
-//    public Result searchResult(@RequestParam("keyword") String keywords) {
-//        // 关键词为空时查询出所有博文
-//        if ("".equals(keywords)) {
-//            System.out.println("查询所有信息!");
-//            return ResultFactory
-//                    .buildSuccessResult(blogService.list());
-//        } else {
-//            System.out.println("查询指定标题博文!");
-//            return ResultFactory
-//                    .buildSuccessResult(blogService.findAllByTitleLike(keywords));
-//        }
-//    }
 
+    @CrossOrigin
+    @GetMapping("/api/blogbylikenum/{size}/{page}")
+    //分页根据文章热门程度查询博文信息
+    public Result listArticlesByLikeNum(@PathVariable("size") int size
+            , @PathVariable("page") int page) {
+        return ResultFactory
+                .buildSuccessResult(blogService.
+                        findAllByLikeNumGreaterThanEqualAndStatus(page - 1, size,1000,1));
+
+        }
 
     @CrossOrigin
     @GetMapping("/api/blog/{id}")
@@ -208,11 +205,44 @@ public class BlogController {
 
 
     @CrossOrigin
-    @GetMapping("/api/comment/{size}/{page}")
+    @GetMapping("/api/comment/{blogId}/{size}/{page}")
     //分页查询评论信息
-    public Result listComments(@PathVariable("size") int size, @PathVariable("page") int page) {
-        return ResultFactory.buildSuccessResult(commentService.list(page - 1, size));
+    public List<Map<String, Object>> listComments(@PathVariable ("blogId") int blogId, @PathVariable("size") int size, @PathVariable("page") int pag) {
+        int page = pag-1;
+        List<Map<String,Object>> result = new ArrayList<>();
+        List<Map<String,Object>> test = new ArrayList<>();
+        for(Comment comment:commentService.findAllByBlogId(blogId)){
+            //todo
+            Map<String, Object> map = new HashMap<>();
+            //评论已通过审核
+            if(comment.getPass() ==1){
+                map.put("user",userService.findByUserId(comment.getUserId()));
+                map.put("comment",comment);
+                result.add(map);
+            }
+        }
+        for(int i=0;i<size;i++){
+            if((i+size*page)<result.size())
+                test.add(result.get(page*size+i));
+        }
+        return test;
     }
+
+    @CrossOrigin
+    @GetMapping(value = "/api/commentnum/{id}")
+    @ResponseBody
+    public int getCommentNum(@PathVariable int id) {
+        int num=0;
+        Blog blog = blogService.findByBlogId(id);
+        for(Comment comment:commentService.findAllByBlogId(blog.getBlogId())){
+            if(comment.getPass() == 1)
+                num++;
+        }
+        return num;
+    }
+
+
+
     @CrossOrigin
     @GetMapping("/api/comment/{id}")
     //根据commentId获取评论信息
@@ -239,6 +269,18 @@ public class BlogController {
     public List<Blog> list() throws Exception{
         return blogService.alllist();
     }
+
+    @CrossOrigin
+    @GetMapping("/api/blog/like/userid/{userid}")
+    public List<Blog> LikeList(@PathVariable("userid")int userid) throws Exception{
+        return blogService.findAllLikeByUserId(userid);
+    }
+    @CrossOrigin
+    @GetMapping("/api/blog/collection/userid/{userid}")
+    public List<Blog> CollectionList(@PathVariable("userid")int userid) throws Exception{
+        return blogService.findAllCollectionByUserId(userid);
+    }
+
 
     @CrossOrigin
     @PostMapping("/api/blog/covers")
@@ -285,6 +327,55 @@ public class BlogController {
         return blogService.findById(blogid);
     }
 
+    //管理员模块
+    // 测试通过
+    @CrossOrigin
+    @PostMapping(value = "api/admin/blog/findAll")
+    // 此注解的作用是读取http请求的内容
+    @ResponseBody
+    public List<Blog> findAll(){
+        return blogService.findAll();
+    }
+
+    // 测试通过
+    @CrossOrigin
+    @RequestMapping(value = "api/admin/blog/findBlogById/{blogId}")
+    // 此注解的作用是读取http请求的内容
+    @ResponseBody
+    public Blog findBlogById(@PathVariable(value="blogId")int blogId){
+        return blogService.findByBlogId(blogId);
+    }
+    // 测试通过
+    @CrossOrigin
+    @RequestMapping(value = "api/admin/blog/findTitleById/{blogId}")
+    // 此注解的作用是读取http请求的内容
+    @ResponseBody
+    public String findTitleById(@PathVariable(value="blogId")int blogId){
+
+        Blog blog = blogService.findByBlogId(blogId);
+        return blog.getTitle();
+    }
+
+    // 测试通过
+    // 通过传入博客id和一个bool类型的审核结果改变审核结果，返回状态码
+    @CrossOrigin
+    @RequestMapping(value = "api/admin/blog/changeStatus/{blogId}/{pass}")
+    @ResponseBody
+    public Result checkBlog(@PathVariable(value="blogId")int blogId,@PathVariable(value="pass")boolean pass){
+        Blog blog = blogService.findByBlogId(blogId);
+        if(pass){
+            blog.setStatus(1);
+        }else{
+            blog.setStatus(2);
+        }
+        blogService.save(blog);
+        if(true){
+            return new Result(200);
+        }
+        else {
+            return new Result(400);
+        }
+    }
 
 
 

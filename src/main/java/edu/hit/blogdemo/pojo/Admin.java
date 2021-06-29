@@ -9,7 +9,7 @@ import java.util.Objects;
 @Entity
 public class Admin {
     private int adminId;
-    private int adminName;
+    private String adminName;
     private String adminPassword;
 
     @Id
@@ -24,11 +24,11 @@ public class Admin {
 
     @Basic
     @Column(name = "admin_name")
-    public int getAdminName() {
+    public String getAdminName() {
         return adminName;
     }
 
-    public void setAdminName(int adminName) {
+    public void setAdminName(String adminName) {
         this.adminName = adminName;
     }
 

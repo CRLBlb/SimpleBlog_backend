@@ -52,21 +52,28 @@ public class InformationController {
                     }
                 }
             }
-            for(Likes likes:likesService.findAllByBlogId(blog.getBlogId())){
-                if(likes.getStatus()==0&&userSettingsService.findAllByUserId(userId).getIsLike()==1){
-                    result.put("like",false);
+            if(likesService.findAllByBlogId(blog.getBlogId())!=null) {
+                for (Likes likes : likesService.findAllByBlogId(blog.getBlogId())) {
+                    if (likes.getStatus() == 0 && userSettingsService.findAllByUserId(userId).getIsLike() == 1) {
+                        result.put("like", false);
+                        break;
+                    }
+                }
+            }
+        }
+        if(userBroadcastService.findAllByUserId(userId)!=null) {
+            for (UserBroadcast userBroadcast : userBroadcastService.findAllByUserId(userId)) {
+                if (userBroadcast.getStatus() == 0 && userSettingsService.findAllByUserId(userId).getIsBroadcast() == 1) {
+                    result.put("broadcast", false);
                     break;
                 }
             }
-            for(Follow follow:followService.findAllByStarId(userId)){
-                if(follow.getStatus()==0&&userSettingsService.findAllByUserId(userId).getIsFollow()==1){
-                    result.put("follow",false);
-                    break;
-                }
-            }
-            for(UserBroadcast userBroadcast:userBroadcastService.findAllByUserId(userId)){
-                if (userBroadcast.getStatus()==0&&userSettingsService.findAllByUserId(userId).getIsBroadcast()==1){
-                    result.put("broadcast",false);
+        }
+        if(followService.findAllByStarId(userId)!=null) {
+            for (Follow follow : followService.findAllByStarId(userId)) {
+                System.out.println(follow.getFollowId());
+                if (follow.getStatus() == 0 && userSettingsService.findAllByUserId(userId).getIsFollow() == 1) {
+                    result.put("follow", false);
                     break;
                 }
             }

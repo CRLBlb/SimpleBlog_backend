@@ -53,7 +53,7 @@ public class MessageService {
     }
 
     public List<User> fff(Integer user_id){
-        List<User> result= userDAO.findAllByUserId(messageDAO.findSessionById(user_id));
+        List<User> result= userDAO.findAllByUserIdIn(messageDAO.findSessionById(user_id));
         return result;
     }
 
@@ -63,5 +63,10 @@ public class MessageService {
             m.setIsRead((byte) 1);
             messageDAO.save(m);
         }
+    }
+
+    public boolean checkMessage(Integer id) {
+        int num = messageDAO.findAllByReceiverIdAndIsRead(id,(byte) 0).size();
+        return num != 0;
     }
 }

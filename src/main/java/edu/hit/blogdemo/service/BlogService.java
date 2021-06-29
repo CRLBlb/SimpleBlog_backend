@@ -1,16 +1,21 @@
 package edu.hit.blogdemo.service;
 
 import edu.hit.blogdemo.dao.BlogDAO;
+import edu.hit.blogdemo.dao.CollectionDAO;
 import edu.hit.blogdemo.dao.LikesDAO;
 import edu.hit.blogdemo.pojo.Blog;
+import edu.hit.blogdemo.pojo.Collections;
+import edu.hit.blogdemo.pojo.Likes;
 import edu.hit.blogdemo.util.MyPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,22 +28,32 @@ public class BlogService {
     BlogDAO blogDAO;
     @Autowired
     LikesDAO likesDAO;
+    @Autowired
+    CollectionDAO collectionDAO;
 
-    //分页查询所有信息
-    public MyPage list(int page, int size) {
+    //分页查询所有博文信息(已通过审核文章)
+    public MyPage list(int page, int size,int status) {
         MyPage<Blog> articles;
         Sort sort = new Sort(Sort.Direction.DESC, "blogId");
-        Page<Blog> articlesInDb = blogDAO.findAll(PageRequest.of(page, size, sort));
+        Page<Blog> articlesInDb = blogDAO.findAllByStatus(PageRequest.of(page, size, sort),status);
         articles = new MyPage<>(articlesInDb);
         return articles;
     }
-
-    //分页根据标题模糊查询Blog所有信息
-    public MyPage findAllByTitleLike(int page, int size,String  title) {
+    //分页查询点赞数大于某个数值的热门文章
+    public MyPage findAllByLikeNumGreaterThanEqualAndStatus(int page, int size, int likesNum,int status){
         MyPage<Blog> articles;
         Sort sort = new Sort(Sort.Direction.DESC, "blogId");
-        Page<Blog> articlesInDb = blogDAO.findAllByTitleLike(PageRequest.of(page, size, sort)
-                ,'%' + title + '%');
+        Page<Blog> articlesInDb = blogDAO
+                .findAllByLikeNumGreaterThanEqualAndStatus(PageRequest.of(page, size, sort),likesNum,status);
+        articles = new MyPage<>(articlesInDb);
+        return articles;
+    }
+    //分页根据标题模糊查询Blog所有信息(所有status=1的状态)
+    public MyPage findAllByTitleLikeAndStatus(int page, int size,String  title,int status) {
+        MyPage<Blog> articles;
+        Sort sort = new Sort(Sort.Direction.DESC, "blogId");
+        Page<Blog> articlesInDb = blogDAO.findAllByTitleLikeAndStatus(PageRequest.of(page, size, sort)
+                ,'%' + title + '%',1);
         articles = new MyPage<>(articlesInDb);
         return articles;
     }
@@ -71,6 +86,24 @@ public class BlogService {
         return blogDAO.findAllByUserId(userId);
     }
 
+    public List<Blog> findAllLikeByUserId(int userId){
+        List<Blog> rtn =  new ArrayList();
+        List<Likes> likes = likesDAO.findAllByUserId(userId);
+        for(Likes like:likes){
+            rtn.add(blogDAO.findByBlogId(like.getBlogId()));
+        }
+        return rtn;
+    }
+
+    public List<Blog> findAllCollectionByUserId(int userId){
+        List<Blog> rtn =  new ArrayList();
+        List<Collections> collections = collectionDAO.findAllByUserId(userId);
+        for(Collections col:collections){
+            rtn.add(blogDAO.findByBlogId(col.getBlogId()));
+        }
+        return rtn;
+    }
+
 
     public List<Blog> alllist(){
         Sort sort = Sort.by(Sort.Direction.DESC, "userId");
@@ -89,5 +122,13 @@ public class BlogService {
     }
     public Blog findById(int blogid){
         return blogDAO.findByBlogId(blogid);
+    }
+
+    //whn
+    public Blog save(Blog blog) {
+        return blogDAO.save(blog);
+    }
+    public List<Blog> findAll() {
+        return blogDAO.findAll();
     }
 }

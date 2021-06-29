@@ -17,8 +17,8 @@ public class User {
     private String nickname;
     private String avatar;
     private String userEmail;
-    //设置时间格式
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//    //设置时间格式
+//    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp userCreateTime;
     private byte status;
 

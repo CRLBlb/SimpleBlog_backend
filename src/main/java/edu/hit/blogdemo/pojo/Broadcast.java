@@ -18,6 +18,7 @@ public class Broadcast {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp broadcastCreateTime;
     private Byte status;
+    private String broadcastTitle;
 
     @Id
     @Column(name = "broadcast_id")
@@ -90,5 +91,15 @@ public class Broadcast {
 
     public void setStatus(Byte status) {
         this.status = status;
+    }
+
+    @Basic
+    @Column(name = "broadcast_title")
+    public String getBroadcastTitle() {
+        return broadcastTitle;
+    }
+
+    public void setBroadcastTitle(String broadcastTitle) {
+        this.broadcastTitle = broadcastTitle;
     }
 }

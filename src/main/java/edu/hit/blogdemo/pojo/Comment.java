@@ -15,10 +15,11 @@ public class Comment {
     private Integer userId;
     private Integer blogId;
     private String commentContent;
-    //设置时间格式
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//    //设置时间格式
+//    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Timestamp commentCreateTime;
     private Byte status;
+    private Byte pass;
 
     @Id
     @Column(name = "comment_id")
@@ -91,5 +92,15 @@ public class Comment {
     @Override
     public int hashCode() {
         return Objects.hash(commentId, userId, blogId, commentContent, commentCreateTime, status);
+    }
+
+    @Basic
+    @Column(name = "pass")
+    public Byte getPass() {
+        return pass;
+    }
+
+    public void setPass(Byte pass) {
+        this.pass = pass;
     }
 }
